@@ -36,6 +36,9 @@ RUN pacman -S --noconfirm --noprogressbar \
         git \
         binutils \
         patch \
+        base-devel \
+        python2 \
+        wget \
     && (echo -e "y\ny\n" | pacman -Scc)
 
 # Install MingW packages
@@ -59,7 +62,6 @@ RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-libtiff \
         mingw-w64-libxml2 \
         mingw-w64-mariadb-connector-c \
-        mingw-w64-nsis \
         mingw-w64-openssl \
         mingw-w64-openjpeg \
         mingw-w64-openjpeg2 \
@@ -90,28 +92,30 @@ RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-zlib \
     && (echo -e "y\ny\n" | pacman -Scc)
 
-# Install AUR packages
-RUN BUILDDIR=/home/tmp-build; \
-mkdir "${BUILDDIR}"; \
-chmod 777 "${BUILDDIR}"; \
-chgrp nobody "${BUILDDIR}"; \
-chmod g+ws "${BUILDDIR}"; 
-setfacl -m u::rwx,g::rwx "${BUILDDIR}"; \
-setfacl -d --set u::rwx,g::rwx,o::- "${BUILDDIR}"; \
-cd "${BUILDDIR}"; \
-curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=mingw-w64-boost; \
-curl -o boost-mingw.patch https://aur.archlinux.org/cgit/aur.git/plain/boost-mingw.patch?h=mingw-w64-boost; \
-export TMPDIR="${BUILDDIR}/tempdir"; \
-sudo -u nobody makepkg PKGBUILD --noconfirm; \
-pacman -U mingw-w64-boost.pkg.tar.xz; \
-rm PKGBUILD; \
-curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=mingw-w64-eigen; \
-sudo -u nobody makepkg PKGBUILD --noconfirm; \
-pacman -U mingw-w64-eigen.pkg.tar.xz; \
-rm -rf "${BUILDDIR}"
-
 # Create devel user...
 RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
+
+# Install AUR packages
+RUN BUILDDIR=/home/tmp-build; \
+        mkdir "${BUILDDIR}"; \
+        chmod 777 "${BUILDDIR}"; \
+        chgrp users "${BUILDDIR}"; \
+        chmod g+ws "${BUILDDIR}"; \
+        setfacl -m u::rwx,g::rwx "${BUILDDIR}"; \
+        setfacl -d --set u::rwx,g::rwx,o::- "${BUILDDIR}"; \
+        cd "${BUILDDIR}"; \
+        export TMPDIR="${BUILDDIR}/tempdir"; \
+        curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=mingw-w64-boost"; \
+        curl -o boost-mingw.patch "https://aur.archlinux.org/cgit/aur.git/plain/boost-mingw.patch?h=mingw-w64-boost"; \
+        ls -l; \
+        su - devel -c 'cd /home/tmp-build; makepkg --noconfirm'; \
+        pacman -U mingw-w64-boost.pkg.tar.xz; \
+        rm PKGBUILD; \
+        curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=mingw-w64-eigen"; \
+        su - devel -c 'cd /home/tmp-build; makepkg --noconfirm'; \
+        pacman -U mingw-w64-eigen.pkg.tar.xz; \
+        rm -rf "${BUILDDIR}"
+
 USER devel
 ENV HOME=/home/devel
 WORKDIR /home/devel
