@@ -1,0 +1,1 @@
+# docker-mingw-qt5
