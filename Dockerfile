@@ -97,14 +97,14 @@ RUN BUILDDIR=/home/tmp-build; \
         chmod 777 "${BUILDDIR}"; \
         cd "${BUILDDIR}"; \
         export TMPDIR="${BUILDDIR}/tempdir"; \
-        gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53; \
+        su - devel -c 'gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53'; \
         curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower; \
         su - devel -c "cd ${BUILDDIR}; makepkg --noconfirm"; \
-        pacman -U cower-*.pkg.tar.xz; \
+        pacman -U --noconfirm --noprogressbar cower-*.pkg.tar.xz; \
         rm PKGBUILD; \
         curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur; \
         su - devel -c "cd ${BUILDDIR}; makepkg --noconfirm"; \
-        pacman -U pacaur-*.pkg.tar.xz;
+        pacman -U --noconfirm --noprogressbar pacaur-*.pkg.tar.xz;
 
 # Install AUR packages
 
