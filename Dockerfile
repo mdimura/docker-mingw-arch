@@ -33,7 +33,7 @@ RUN    echo "[archlinuxfr]" >> /etc/pacman.conf \
 RUN pacman -S --noconfirm --noprogressbar \
         imagemagick make git binutils \
         patch base-devel python2 wget \
-        expac yajl
+        expac yajl \
     && (echo -e "y\ny\n" | pacman -Scc)
 
 # Install MingW packages
@@ -102,7 +102,7 @@ RUN BUILDDIR=/home/tmp-build; \
         su - devel -c "cd ${BUILDDIR}; makepkg --noconfirm"; \
         pacman -U cower-*.pkg.tar.xz; \
         rm PKGBUILD; \
-        curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur
+        curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur; \
         su - devel -c "cd ${BUILDDIR}; makepkg --noconfirm"; \
         pacman -U pacaur-*.pkg.tar.xz;
 
