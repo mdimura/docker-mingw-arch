@@ -31,14 +31,9 @@ RUN    echo "[archlinuxfr]" >> /etc/pacman.conf \
 
 # Add some useful packages to the base system
 RUN pacman -S --noconfirm --noprogressbar \
-        imagemagick \
-        make \
-        git \
-        binutils \
-        patch \
-        base-devel \
-        python2 \
-        wget \
+        imagemagick make git binutils \
+        patch base-devel python2 wget \
+        expac yajl
     && (echo -e "y\ny\n" | pacman -Scc)
 
 # Install MingW packages
@@ -95,23 +90,23 @@ RUN pacman -S --noconfirm --noprogressbar \
 # Create devel user...
 RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
 
-# Install AUR packages
+# Install pacaur packages
 RUN BUILDDIR=/home/tmp-build; \
         mkdir "${BUILDDIR}"; \
         chown devel.users "${BUILDDIR}"; \
         chmod 777 "${BUILDDIR}"; \
         cd "${BUILDDIR}"; \
         export TMPDIR="${BUILDDIR}/tempdir"; \
-        curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=mingw-w64-boost"; \
-        curl -o boost-mingw.patch "https://aur.archlinux.org/cgit/aur.git/plain/boost-mingw.patch?h=mingw-w64-boost"; \
-        su - devel -c 'cd /home/tmp-build; makepkg --noconfirm'; \
-        pacman -U mingw-w64-boost-*.pkg.tar.xz; \
+        gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53; \
+        curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower; \
+        su - devel -c "cd ${BUILDDIR}; makepkg --noconfirm"; \
+        pacman -U cower-*.pkg.tar.xz; \
         rm PKGBUILD; \
-        curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=mingw-w64-eigen"; \
-        curl -o eigen-3.2_gcc58087.patch "https://aur.archlinux.org/cgit/aur.git/plain/eigen-3.2_gcc58087.patch?h=mingw-w64-eigen"; \
-        su - devel -c 'cd /home/tmp-build; makepkg --noconfirm'; \
-        pacman -U mingw-w64-eigen-*.pkg.tar.xz; \
-        rm -rf "${BUILDDIR}"
+        curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur
+        su - devel -c "cd ${BUILDDIR}; makepkg --noconfirm"; \
+        pacman -U pacaur-*.pkg.tar.xz;
+
+# Install AUR packages
 
 USER devel
 ENV HOME=/home/devel
