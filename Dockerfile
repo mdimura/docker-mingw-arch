@@ -90,23 +90,42 @@ RUN pacman -S --noconfirm --noprogressbar \
 # Create devel user...
 RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
 
-# Install pacaur packages
+# Install pacaur
+RUN echo 'devel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER devel
 RUN BUILDDIR=/home/tmp-build; \
-        mkdir "${BUILDDIR}"; \
-        chown devel.users "${BUILDDIR}"; \
+        sudo mkdir "${BUILDDIR}"; \
+        sudo chown devel.users "${BUILDDIR}"; \
         chmod 777 "${BUILDDIR}"; \
         cd "${BUILDDIR}"; \
-        export TMPDIR="${BUILDDIR}/tempdir"; \
-        su - devel -c 'gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53'; \
+        gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53; \
         curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower; \
-        su - devel -c "cd ${BUILDDIR}; makepkg --noconfirm"; \
-        pacman -U --noconfirm --noprogressbar cower-*.pkg.tar.xz; \
+        export PATH=$PATH:/usr/bin/core_perl; \
+        makepkg -si --noconfirm; \
         rm PKGBUILD; \
         curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur; \
-        su - devel -c "cd ${BUILDDIR}; makepkg --noconfirm"; \
-        pacman -U --noconfirm --noprogressbar pacaur-*.pkg.tar.xz;
+        makepkg -si --noconfirm; \
+        sudo rm -rf "${BUILDDIR}"
 
 # Install AUR packages
+RUN export EDITOR=echo; export MAKEFLAGS="-j$(nproc)";\
+    pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
+        mingw-w64-boost \
+        mingw-w64-eigen \
+        mingw-w64-python-bin \
+        mingw-w64-readerwriterqueue-git \
+        mingw-w64-libcuckoo-git \
+        mingw-w64-async++-git \
+        mingw-w64-pteros-git
+
+# Cleanup
+USER root
+RUN sed -i '/devel ALL/d' /etc/sudoers; \
+    paccache -r -k0; \
+    pacaur -Scc; \
+    rm -rf /usr/share/man/*; \
+    rm -rf /tmp/*; \
+    rm -rf /var/tmp/*
 
 USER devel
 ENV HOME=/home/devel
