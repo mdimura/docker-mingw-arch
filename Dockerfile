@@ -111,7 +111,7 @@ RUN BUILDDIR=/home/tmp-build; \
 RUN export EDITOR=echo; export MAKEFLAGS="-j$(nproc)";\
     pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
         mingw-w64-configure \
-        mingw-w64-gperftools \
+        mingw-w64-jemalloc \
         mingw-w64-boost \
         mingw-w64-eigen \
         mingw-w64-python-bin \
