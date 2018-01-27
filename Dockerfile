@@ -7,6 +7,10 @@
 FROM base/archlinux:latest
 MAINTAINER Mykola Dimura <mykola.dimura@gmail.com>
 
+# Select a mirror
+RUN cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup \
+    && rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
+
 # Update base system
 RUN    pacman -Sy --noconfirm --noprogressbar archlinux-keyring \
     && pacman-key --populate \
@@ -23,20 +27,14 @@ RUN    echo "[ownstuff]" >> /etc/pacman.conf \
     && echo "Server = https://martchus.no-ip.biz/repo/arch/ownstuff/os/\$arch" >> /etc/pacman.conf \
     && pacman -Sy
 
-# Add archlinuxfr repo (yaourt)
-RUN    echo "[archlinuxfr]" >> /etc/pacman.conf \
-    && echo "SigLevel = Never" >> /etc/pacman.conf \
-    && echo "Server = http://repo.archlinux.fr/\$arch" >> /etc/pacman.conf \
-    && pacman -Sy
-
-# Add some useful packages to the base system
+# Add packages to the base system
 RUN pacman -S --noconfirm --noprogressbar \
         imagemagick make git binutils \
         patch base-devel python2 wget \
         expac yajl \
     && (echo -e "y\ny\n" | pacman -Scc)
 
-# Install MingW packages
+# Install MingW packages (from ownstuff)
 RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-binutils \
         mingw-w64-crt \
@@ -69,7 +67,6 @@ RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-qt5-imageformats \
         mingw-w64-qt5-location \
         mingw-w64-qt5-multimedia \
-        mingw-w64-qt5-quick1 \
         mingw-w64-qt5-quickcontrols \
         mingw-w64-qt5-script \
         mingw-w64-qt5-sensors \
@@ -108,7 +105,7 @@ RUN BUILDDIR=/home/tmp-build; \
         sudo rm -rf "${BUILDDIR}"
 
 # Install AUR packages
-RUN export EDITOR=echo; export MAKEFLAGS="-j$(nproc)";\
+RUN export EDITOR=echo; export MAKEFLAGS="-j$(nproc)"; \
     pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
         mingw-w64-qt5-serialport \
         mingw-w64-configure \
@@ -118,8 +115,8 @@ RUN export EDITOR=echo; export MAKEFLAGS="-j$(nproc)";\
         mingw-w64-python-bin \
         mingw-w64-readerwriterqueue-git \
         mingw-w64-libcuckoo-git \
-        mingw-w64-async++-git \
-        mingw-w64-pteros-git
+        mingw-w64-async++-git
+#        mingw-w64-pteros-git
 
 # Cleanup
 USER root
