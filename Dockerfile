@@ -31,7 +31,7 @@ RUN    echo "[ownstuff]" >> /etc/pacman.conf \
 RUN pacman -S --noconfirm --noprogressbar \
         imagemagick make git binutils \
         patch base-devel python2 wget \
-        expac yajl \
+        expac yajl nano \
     && (echo -e "y\ny\n" | pacman -Scc)
 
 # Install MingW packages (from ownstuff)
@@ -115,7 +115,8 @@ RUN export EDITOR=echo; export MAKEFLAGS="-j$(nproc)"; \
         mingw-w64-python-bin \
         mingw-w64-readerwriterqueue-git \
         mingw-w64-libcuckoo-git \
-        mingw-w64-async++-git
+        mingw-w64-async++-git \
+        mingw-w64-spdlog-git
 #        mingw-w64-pteros-git
 
 # Cleanup
