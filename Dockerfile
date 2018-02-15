@@ -107,17 +107,18 @@ RUN BUILDDIR=/home/tmp-build; \
 # Install AUR packages
 RUN export EDITOR=echo; export MAKEFLAGS="-j$(nproc)"; \
     pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
-        mingw-w64-qt5-serialport \
-        mingw-w64-configure \
-        mingw-w64-jemalloc \
         mingw-w64-boost \
         mingw-w64-eigen \
+        mingw-w64-qt5-quickcontrols2 \
+        mingw-w64-qt5-serialport \
+        mingw-w64-configure \
+        mingw-w64-jemalloc \       
         mingw-w64-python-bin \
         mingw-w64-readerwriterqueue-git \
         mingw-w64-libcuckoo-git \
         mingw-w64-async++-git \
-        mingw-w64-spdlog-git
-#        mingw-w64-pteros-git
+        mingw-w64-spdlog-git \
+        mingw-w64-pteros-git
 
 # Cleanup
 USER root
