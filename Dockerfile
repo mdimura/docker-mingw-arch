@@ -34,6 +34,8 @@ RUN pacman -S --noconfirm --noprogressbar \
         expac yajl nano \
     && (echo -e "y\ny\n" | pacman -Scc)
 
+ENV EDITOR=nano
+
 # Install MingW packages (from ownstuff)
 RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-binutils \
@@ -86,26 +88,24 @@ RUN pacman -S --noconfirm --noprogressbar \
 
 # Create devel user...
 RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
+RUN echo 'devel ALL=(ALL) NOPASSWD: /usr/sbin/pacman, /usr/sbin/makepkg, /usr/sbin/pacaur' >> /etc/sudoers;
 
 # Install pacaur
-RUN echo 'devel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+ARG BUILDDIR=/tmp/tmp-build
 USER devel
-RUN BUILDDIR=/home/tmp-build; \
-        sudo mkdir "${BUILDDIR}"; \
-        sudo chown devel.users "${BUILDDIR}"; \
-        chmod 777 "${BUILDDIR}"; \
-        cd "${BUILDDIR}"; \
-        gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53; \
-        curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower; \
-        export PATH=$PATH:/usr/bin/core_perl; \
-        makepkg -si --noconfirm; \
-        rm PKGBUILD; \
-        curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur; \
-        makepkg -si --noconfirm; \
-        sudo rm -rf "${BUILDDIR}"
+ENV EDITOR=nano
+RUN  mkdir "${BUILDDIR}"; cd "${BUILDDIR}"; \
+     gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53; \
+     curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower; \
+     export PATH=$PATH:/usr/bin/core_perl; \
+     makepkg -si --noconfirm; \
+     rm PKGBUILD; \
+     curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur; \
+     makepkg -si --noconfirm; \
+     rm -rf "${BUILDDIR}"
 
 # Install AUR packages
-RUN export EDITOR=echo; export MAKEFLAGS="-j$(nproc)"; \
+RUN export MAKEFLAGS="-j$(nproc)"; \
     pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
         mingw-w64-boost \
         mingw-w64-eigen \
@@ -117,21 +117,24 @@ RUN export EDITOR=echo; export MAKEFLAGS="-j$(nproc)"; \
         mingw-w64-readerwriterqueue-git \
         mingw-w64-libcuckoo-git \
         mingw-w64-async++-git \
-        mingw-w64-spdlog-git \
-        mingw-w64-pteros-git
+        mingw-w64-spdlog-git 
+
+# Optional packages
+RUN pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
+           mingw-w64-pteros-git; exit 0
 
 # Cleanup
 USER root
-RUN sed -i '/devel ALL/d' /etc/sudoers; \
-    paccache -r -k0; \
+RUN paccache -r -k0; \
     pacaur -Scc; \
     rm -rf /usr/share/man/*; \
     rm -rf /tmp/*; \
-    rm -rf /var/tmp/*
+    rm -rf /var/tmp/*;
 
 USER devel
 ENV HOME=/home/devel
 WORKDIR /home/devel
+
 
 # ... but don't use it on the next image builds
 ONBUILD USER root
