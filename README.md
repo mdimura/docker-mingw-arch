@@ -1,5 +1,5 @@
 # docker-mingw-qt5
-mingw-based build environment based on arch-linux. Contains mingw- versions of Qt5, cmake, Eigen3, boost.
+mingw-based build environment based on arch-linux. The image provides easy and CI/CD friendly cross-compilation for windows target. mingw- versions of Qt5, cmake, Eigen3, boost are included. Dosens of [other libraries][1] are available from the package manager.
 # Usage
 Start the docker container:
 ```bash
@@ -19,7 +19,11 @@ x86_64-w64-mingw32-cmake ..
 
 That's it!
 # Dependencies
-If you need some other dependencies, you can install them from [AUR][1]. If mingw- version of the needed libarary is not available in AUR, you can add it yourself. The process is really straightforward. You would need to write a [PKBUILD file][2], which is as intuitive as it can get, see [mingw-w64-rapidjson][3], for example.
+If you need some other dependencies, you can install them from [AUR][1]. 
+```bash
+pacaur -S --noedit mingw-w64-rapidjson
+```
+If mingw- version of the needed libarary is not available in AUR, you can add it yourself. The process is really straightforward. You would need to write a [PKBUILD file][2], which is as intuitive as it can get, see [mingw-w64-rapidjson][3], for example.
 
 [1]: https://aur.archlinux.org/packages/?O=0&SeB=nd&K=mingw-w64&outdated=&SB=v&SO=d&PP=250&do_Search=Go
 [2]: https://wiki.archlinux.org/index.php/creating_packages
