@@ -94,18 +94,18 @@ RUN echo 'devel ALL=(ALL) NOPASSWD: /usr/sbin/pacman, /usr/sbin/makepkg, /usr/sb
 ARG BUILDDIR=/tmp/tmp-build
 USER devel
 ENV EDITOR=nano
-RUN  mkdir "${BUILDDIR}"; cd "${BUILDDIR}"; \
-     gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53; \
-     curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower; \
-     export PATH=$PATH:/usr/bin/core_perl; \
-     makepkg -si --noconfirm; \
-     rm PKGBUILD; \
-     curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur; \
-     makepkg -si --noconfirm; \
+RUN  mkdir "${BUILDDIR}" && cd "${BUILDDIR}" && \
+     gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53 && \
+     curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower && \
+     export PATH=$PATH:/usr/bin/core_perl && \
+     makepkg -si --noconfirm && \
+     rm PKGBUILD && \
+     curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur && \
+     makepkg -si --noconfirm && \
      rm -rf "${BUILDDIR}"
 
 # Install AUR packages
-RUN export MAKEFLAGS="-j$(nproc)"; \
+RUN export MAKEFLAGS="-j$(nproc)" ** \
     pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
         mingw-w64-boost \
         mingw-w64-eigen \
