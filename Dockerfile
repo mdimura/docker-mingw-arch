@@ -105,7 +105,7 @@ RUN  mkdir "${BUILDDIR}" && cd "${BUILDDIR}" && \
      rm -rf "${BUILDDIR}"
 
 # Install AUR packages
-RUN export MAKEFLAGS="-j$(nproc)" ** \
+RUN export MAKEFLAGS="-j$(nproc)" && \
     pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
         mingw-w64-boost \
         mingw-w64-eigen \
