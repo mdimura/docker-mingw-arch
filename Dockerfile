@@ -9,7 +9,7 @@ MAINTAINER Mykola Dimura <mykola.dimura@gmail.com>
 
 # Select a mirror
 RUN pacman -Sy --noconfirm --noprogressbar pacman-contrib && \
-    pacman -Sy --noconfirm --noprogressbarcp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup \
+    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup \
     && rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
 
 # Update base system
