@@ -22,12 +22,6 @@ RUN    pacman -Sy --noconfirm --noprogressbar archlinux-keyring \
     && pacman -Syyu --noconfirm --noprogressbar \
     && (echo -e "y\ny\n" | pacman -Scc)
 
-# Add mingw-repo
-RUN    echo "[ownstuff]" >> /etc/pacman.conf \
-    && echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf \
-    && echo "Server = https://martchus.no-ip.biz/repo/arch/ownstuff/os/\$arch" >> /etc/pacman.conf \
-    && pacman -Sy
-
 # Add packages to the base system
 RUN pacman -S --noconfirm --noprogressbar \
         imagemagick make git binutils \
@@ -36,6 +30,12 @@ RUN pacman -S --noconfirm --noprogressbar \
     && (echo -e "y\ny\n" | pacman -Scc)
 
 ENV EDITOR=nano
+
+# Add mingw-repo
+RUN    echo "[ownstuff]" >> /etc/pacman.conf \
+    && echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf \
+    && echo "Server = https://martchus.no-ip.biz/repo/arch/ownstuff/os/\$arch" >> /etc/pacman.conf \
+    && pacman -Sy
 
 # Install MingW packages (from ownstuff)
 RUN pacman -S --noconfirm --noprogressbar \
