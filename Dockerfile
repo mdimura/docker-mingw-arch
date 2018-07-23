@@ -122,7 +122,7 @@ RUN export MAKEFLAGS="-j$(nproc)" && \
 
 # Optional packages
 RUN pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
-           mingw-w64-pteros-git; exit 0
+           mingw-w64-pteros-stable; exit 0
 
 # Cleanup
 USER root
