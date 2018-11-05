@@ -113,15 +113,15 @@ RUN export MAKEFLAGS="-j$(nproc)" && \
         mingw-w64-qt5-quickcontrols2 \
         mingw-w64-qt5-serialport \
         mingw-w64-configure \
-        mingw-w64-jemalloc \       
-        mingw-w64-python-bin \
-        mingw-w64-readerwriterqueue-git \
-        mingw-w64-libcuckoo-git \
-        mingw-w64-async++-git \
-        mingw-w64-spdlog-git 
+        mingw-w64-python-bin 
+        
 
 # Optional packages
 RUN pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
+           mingw-w64-readerwriterqueue-git \
+           mingw-w64-libcuckoo-git \
+           mingw-w64-async++-git \
+           mingw-w64-spdlog-git \
            mingw-w64-pteros-stable; exit 0
 
 # Cleanup
@@ -140,3 +140,4 @@ WORKDIR /home/devel
 # ... but don't use it on the next image builds
 ONBUILD USER root
 ONBUILD WORKDIR /
+
