@@ -122,7 +122,7 @@ RUN pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
            mingw-w64-libcuckoo-git \
            mingw-w64-async++-git \
            mingw-w64-spdlog-git \
-           mingw-w64-pteros-stable; exit 0
+           mingw-w64-pteros; exit 0
 
 # Cleanup
 USER root
