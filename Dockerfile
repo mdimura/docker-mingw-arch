@@ -76,7 +76,6 @@ RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-qt5-svg \
         mingw-w64-qt5-tools \
         mingw-w64-qt5-translations \
-        mingw-w64-qt5-webkit \
         mingw-w64-qt5-websockets \
         mingw-w64-qt5-winextras \
         mingw-w64-readline \
@@ -118,11 +117,13 @@ RUN export MAKEFLAGS="-j$(nproc)" && \
 
 # Optional packages
 RUN pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
+           mingw-w64-qt5-webkit \
            mingw-w64-readerwriterqueue-git \
            mingw-w64-libcuckoo-git \
            mingw-w64-async++-git \
            mingw-w64-spdlog-git \
-           mingw-w64-pteros; exit 0
+           mingw-w64-pteros; \
+           exit 0
 
 # Cleanup
 USER root
