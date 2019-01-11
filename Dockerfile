@@ -117,7 +117,6 @@ RUN export MAKEFLAGS="-j$(nproc)" && \
 
 # Optional packages
 RUN pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
-           mingw-w64-qt5-webkit \
            mingw-w64-readerwriterqueue-git \
            mingw-w64-libcuckoo-git \
            mingw-w64-async++-git \
