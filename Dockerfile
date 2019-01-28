@@ -95,7 +95,7 @@ ARG BUILDDIR=/tmp/tmp-build
 USER devel
 ENV EDITOR=nano
 RUN  mkdir "${BUILDDIR}" && cd "${BUILDDIR}" && \
-     gpg --recv-keys --keyserver hkp://pool.sks-keyservers.net 1EB2638FF56C0C53 && \
+     gpg --recv-keys --keyserver hkp://pool.sks-keyservers.net 487EACC08557AD082088DABA1EB2638FF56C0C53 && \
      curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower && \
      export PATH=$PATH:/usr/bin/core_perl && \
      makepkg -si --noconfirm && \
