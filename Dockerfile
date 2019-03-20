@@ -1,10 +1,7 @@
 # MingW64 + Qt5 for cross-compile builds to Windows
 # Based on ArchLinux image
 
-# `pacman -Scc --noconfirm` responds 'N' by default to removing the cache, hence
-# the echo mechanism.
-
-FROM base/archlinux:latest
+FROM archlinux/base:latest
 MAINTAINER Mykola Dimura <mykola.dimura@gmail.com>
 
 # Select a mirror
@@ -13,21 +10,20 @@ RUN pacman -Sy --noconfirm --noprogressbar pacman-contrib && \
     && rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
 
 # Update base system
-RUN    pacman -Sy --noconfirm --noprogressbar archlinux-keyring \
-    && pacman-key --populate \
-    && pacman -Su --noconfirm --noprogressbar pacman \
-    && pacman-db-upgrade \
-    && pacman -Su --noconfirm --noprogressbar ca-certificates \
-    && trust extract-compat \
-    && pacman -Syyu --noconfirm --noprogressbar \
-    && (echo -e "y\ny\n" | pacman -Scc)
+RUN pacman -Sy && \
+    pacman -S archlinux-keyring --noconfirm --noprogressbar --quiet && \
+    pacman -S pacman --noconfirm --noprogressbar --quiet && \
+    pacman-db-upgrade && \
+    pacman -Su --noconfirm --noprogressbar --quiet
 
 # Add packages to the base system
+# `pacman -Scc --noconfirm` responds 'N' by default to removing the cache, hence
+# the echo mechanism.
 RUN pacman -S --noconfirm --noprogressbar \
         imagemagick make git binutils \
         patch base-devel python2 wget \
-        expac yajl nano \
-    && (echo -e "y\ny\n" | pacman -Scc)
+        expac yajl nano
+RUN echo -e "y\ny\n" | pacman -Scc; exit 0
 
 ENV EDITOR=nano
 
@@ -83,30 +79,24 @@ RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-sqlite \
         mingw-w64-termcap \
         mingw-w64-tools \
-        mingw-w64-zlib \
-    && (echo -e "y\ny\n" | pacman -Scc)
+        mingw-w64-zlib 
+RUN echo -e "y\ny\n" | pacman -Scc; exit 0
 
 # Create devel user...
 RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
-RUN echo 'devel ALL=(ALL) NOPASSWD: /usr/sbin/pacman, /usr/sbin/makepkg, /usr/sbin/pacaur' >> /etc/sudoers;
+RUN echo 'devel ALL=(ALL) NOPASSWD: /usr/sbin/pacman, /usr/sbin/makepkg' >> /etc/sudoers;
 
-# Install pacaur
+# Install yay
 ARG BUILDDIR=/tmp/tmp-build
 USER devel
 ENV EDITOR=nano
 RUN  mkdir "${BUILDDIR}" && cd "${BUILDDIR}" && \
-     gpg --recv-keys --keyserver hkp://pool.sks-keyservers.net 487EACC08557AD082088DABA1EB2638FF56C0C53 && \
-     curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower && \
-     export PATH=$PATH:/usr/bin/core_perl && \
-     makepkg -si --noconfirm && \
-     rm PKGBUILD && \
-     curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur && \
-     makepkg -si --noconfirm && \
+     git clone https://aur.archlinux.org/yay.git && \
+     cd yay && makepkg -si --noconfirm --rmdeps && \
      rm -rf "${BUILDDIR}"
 
 # Install AUR packages
-RUN export MAKEFLAGS="-j$(nproc)" && \
-    pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
+RUN yay -S --noconfirm --noprogressbar --needed \
         mingw-w64-boost \
         mingw-w64-eigen \
         mingw-w64-qt5-quickcontrols2 \
@@ -116,7 +106,7 @@ RUN export MAKEFLAGS="-j$(nproc)" && \
         
 
 # Optional packages
-RUN pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
+RUN yay -S --noconfirm --noprogressbar --needed \
            mingw-w64-readerwriterqueue-git \
            mingw-w64-libcuckoo-git \
            mingw-w64-async++-git \
@@ -127,7 +117,7 @@ RUN pacaur -S --noconfirm --noprogressbar --noedit --silent --needed \
 # Cleanup
 USER root
 RUN paccache -r -k0; \
-    pacaur -Scc; \
+    yay -Scc; \
     rm -rf /usr/share/man/*; \
     rm -rf /tmp/*; \
     rm -rf /var/tmp/*;
