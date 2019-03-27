@@ -21,7 +21,7 @@ That's it!
 # Dependencies
 If you need some other dependencies, you can install them from [AUR][1]. 
 ```bash
-pacaur -S --noedit mingw-w64-rapidjson
+yay -S --noedit mingw-w64-rapidjson
 ```
 If mingw- version of the needed libarary is not available in AUR, you can add it yourself. The process is really straightforward. You would need to write a [PKBUILD file][2], which is as intuitive as it can get, see [mingw-w64-rapidjson][3], for example.
 
