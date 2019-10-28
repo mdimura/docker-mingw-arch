@@ -22,7 +22,7 @@ RUN pacman -Sy && \
 RUN pacman -S --noconfirm --noprogressbar \
         imagemagick make git binutils \
         patch base-devel python2 wget \
-        expac yajl nano
+        expac yajl nano openssh
 RUN echo -e "y\ny\n" | pacman -Scc; exit 0
 
 ENV EDITOR=nano
