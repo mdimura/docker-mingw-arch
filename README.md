@@ -16,7 +16,7 @@ Or for CMake:
 ```bash
 x86_64-w64-mingw32-cmake ..
 ```
-Do __deploy__ the program, you will need to copy the dlls from `/usr/{x86_64-w64-mingw32,i686-w64-mingw32}/{bin,lib/qt/plugins/{imageformats,iconengines,platforms}}` (for x64 and x32 builds respectively) to the directory with the .exe file. The list of necessary dlls may vary. If a dll is missing, Windows will usually show an error popup window with the name of the missing dll, when you try to start the program.
+To __deploy__ the program, you will need to copy the dlls from `/usr/{x86_64-w64-mingw32,i686-w64-mingw32}/{bin,lib/qt/plugins/{imageformats,iconengines,platforms}}` (for x64 and x32 builds respectively) to the directory with the .exe file. The list of necessary dlls may vary. If a dll is missing, Windows will usually show an error popup window with the name of the missing dll, when you try to start the program.
 
 That's it!
 # Dependencies
