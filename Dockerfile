@@ -1,47 +1,77 @@
-# MingW64 + Qt5 for cross-compile builds to Windows
+# MingW64 + Qt5 (optionally) for cross-compiling to Windows
 # Based on ArchLinux image
+ARG DOCKER_TAG=latest
 
-FROM archlinux/base:latest
+FROM archlinux/base:latest as base
 MAINTAINER Mykola Dimura <mykola.dimura@gmail.com>
 
-# Select a mirror
-RUN pacman -Sy --noconfirm --noprogressbar pacman-contrib && \
-    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup \
-    && rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
+# Create devel user...
+RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
+RUN echo 'devel ALL=(ALL) NOPASSWD: /usr/sbin/pacman, /usr/sbin/makepkg' >> /etc/sudoers;
 
-# Update base system
-RUN pacman -Sy && \
-    pacman -S archlinux-keyring --noconfirm --noprogressbar --quiet && \
-    pacman -S pacman --noconfirm --noprogressbar --quiet && \
-    pacman-db-upgrade && \
-    pacman -Su --noconfirm --noprogressbar --quiet
+#Workaround for the "setrlimit(RLIMIT_CORE): Operation not permitted" error
+RUN echo "Set disable_coredump false" >> /etc/sudo.conf
+
+RUN pacman -Syyu --noconfirm --noprogressbar 
 
 # Add packages to the base system
-# `pacman -Scc --noconfirm` responds 'N' by default to removing the cache, hence
-# the echo mechanism.
 RUN pacman -S --noconfirm --noprogressbar \
         imagemagick make git binutils \
-        patch base-devel python2 wget \
-        expac yajl nano openssh
-RUN echo -e "y\ny\n" | pacman -Scc; exit 0
+        patch base-devel wget \
+        pacman-contrib expac nano openssh
 
 ENV EDITOR=nano
+
+# Install yay
+USER devel
+ARG BUILDDIR=/tmp/tmp-build
+RUN  mkdir "${BUILDDIR}" && cd "${BUILDDIR}" && \
+     git clone https://aur.archlinux.org/yay.git && \
+     cd yay && makepkg -si --noconfirm --rmdeps && \
+     rm -rf "${BUILDDIR}"
+
+USER root
 
 # Add mingw-repo
 RUN    echo "[ownstuff]" >> /etc/pacman.conf \
     && echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf \
     && echo "Server = https://martchus.no-ip.biz/repo/arch/ownstuff/os/\$arch" >> /etc/pacman.conf \
-    && pacman -Sy
+    && pacman -Sy 
 
-# Install MingW packages (from ownstuff)
+# Install essential MingW packages (from ownstuff)
 RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-binutils \
         mingw-w64-crt \
         mingw-w64-gcc \
         mingw-w64-headers \
         mingw-w64-winpthreads \
-        mingw-w64-bzip2 \
         mingw-w64-cmake \
+        mingw-w64-tools \
+        mingw-w64-zlib 
+
+# Cleanup
+USER root
+RUN pacman -Scc --noconfirm
+RUN paccache -r -k0; \
+    rm -rf /usr/share/man/*; \
+    rm -rf /tmp/*; \
+    rm -rf /var/tmp/*;
+USER devel
+RUN yay -Scc
+
+ENV HOME=/home/devel
+
+WORKDIR /home/devel
+ONBUILD USER root
+ONBUILD WORKDIR /
+
+
+FROM base as qt
+
+USER root
+# Install Qt5 and some other MingW packages (from ownstuff)
+RUN pacman -S --noconfirm --noprogressbar \        
+        mingw-w64-bzip2 \
         mingw-w64-expat \
         mingw-w64-fontconfig \
         mingw-w64-freeglut \
@@ -60,6 +90,10 @@ RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-pcre \
         mingw-w64-pdcurses \
         mingw-w64-pkg-config \
+        mingw-w64-readline \
+        mingw-w64-sdl2 \
+        mingw-w64-sqlite \
+        mingw-w64-termcap \
         mingw-w64-qt5-base \
         mingw-w64-qt5-declarative \
         mingw-w64-qt5-graphicaleffects \
@@ -73,29 +107,10 @@ RUN pacman -S --noconfirm --noprogressbar \
         mingw-w64-qt5-tools \
         mingw-w64-qt5-translations \
         mingw-w64-qt5-websockets \
-        mingw-w64-qt5-winextras \
-        mingw-w64-readline \
-        mingw-w64-sdl2 \
-        mingw-w64-sqlite \
-        mingw-w64-termcap \
-        mingw-w64-tools \
-        mingw-w64-zlib 
-RUN echo -e "y\ny\n" | pacman -Scc; exit 0
-
-# Create devel user...
-RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
-RUN echo 'devel ALL=(ALL) NOPASSWD: /usr/sbin/pacman, /usr/sbin/makepkg' >> /etc/sudoers;
-
-# Install yay
-ARG BUILDDIR=/tmp/tmp-build
-USER devel
-ENV EDITOR=nano
-RUN  mkdir "${BUILDDIR}" && cd "${BUILDDIR}" && \
-     git clone https://aur.archlinux.org/yay.git && \
-     cd yay && makepkg -si --noconfirm --rmdeps && \
-     rm -rf "${BUILDDIR}"
+        mingw-w64-qt5-winextras
 
 # Install AUR packages
+USER devel
 RUN yay -S --noconfirm --noprogressbar --needed \
         mingw-w64-boost \
         mingw-w64-eigen \
@@ -103,31 +118,45 @@ RUN yay -S --noconfirm --noprogressbar --needed \
         mingw-w64-qt5-serialport \
         mingw-w64-configure \
         mingw-w64-python-bin 
-        
-
-# Optional packages
-RUN yay -S --noconfirm --noprogressbar --needed \
-           mingw-w64-readerwriterqueue-git \
-           mingw-w64-libcuckoo-git \
-           mingw-w64-async++-git \
-           mingw-w64-spdlog-git \
-           mingw-w64-pteros; \
-           exit 0
 
 # Cleanup
 USER root
+RUN pacman -Scc --noconfirm
 RUN paccache -r -k0; \
-    yay -Scc; \
     rm -rf /usr/share/man/*; \
     rm -rf /tmp/*; \
     rm -rf /var/tmp/*;
-
 USER devel
-ENV HOME=/home/devel
+RUN yay -Scc
+
 WORKDIR /home/devel
-
-
-# ... but don't use it on the next image builds
 ONBUILD USER root
 ONBUILD WORKDIR /
 
+
+FROM qt as latest
+
+FROM ${DOCKER_TAG} as current
+
+# FROM qt as molsim
+#         
+# # Libraries for molecular modelling/simulations
+# USER devel
+# RUN yay -S --noconfirm --noprogressbar --needed \
+#            mingw-w64-readerwriterqueue-git \
+#            mingw-w64-libcuckoo-git \
+#            mingw-w64-async++-git \
+#            mingw-w64-spdlog-git \
+#            mingw-w64-pteros; \
+#            exit 0
+# 
+# # Cleanup
+# USER root
+# RUN pacman -Scc --noconfirm
+# RUN paccache -r -k0; \
+#     rm -rf /usr/share/man/*; \
+#     rm -rf /tmp/*; \
+#     rm -rf /var/tmp/*;
+# USER devel
+# RUN yay -Scc
+# 
