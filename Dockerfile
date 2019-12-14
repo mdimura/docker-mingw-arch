@@ -1,6 +1,6 @@
 # MingW64 + Qt5 (optionally) for cross-compiling to Windows
 # Based on ArchLinux image
-ARG DOCKER_TAG=latest
+ARG DOCKER_TAG=qt
 
 FROM archlinux/base:latest as base
 MAINTAINER Mykola Dimura <mykola.dimura@gmail.com>
@@ -134,29 +134,4 @@ ONBUILD USER root
 ONBUILD WORKDIR /
 
 
-FROM qt as latest
-
 FROM ${DOCKER_TAG} as current
-
-# FROM qt as molsim
-#         
-# # Libraries for molecular modelling/simulations
-# USER devel
-# RUN yay -S --noconfirm --noprogressbar --needed \
-#            mingw-w64-readerwriterqueue-git \
-#            mingw-w64-libcuckoo-git \
-#            mingw-w64-async++-git \
-#            mingw-w64-spdlog-git \
-#            mingw-w64-pteros; \
-#            exit 0
-# 
-# # Cleanup
-# USER root
-# RUN pacman -Scc --noconfirm
-# RUN paccache -r -k0; \
-#     rm -rf /usr/share/man/*; \
-#     rm -rf /tmp/*; \
-#     rm -rf /var/tmp/*;
-# USER devel
-# RUN yay -Scc
-# 
