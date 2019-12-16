@@ -9,6 +9,8 @@ MAINTAINER Mykola Dimura <mykola.dimura@gmail.com>
 RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
 RUN echo 'devel ALL=(ALL) NOPASSWD: /usr/sbin/pacman, /usr/sbin/makepkg' >> /etc/sudoers;
 
+RUN mkdir -p /workdir && chown devel.users /workdir
+
 #Workaround for the "setrlimit(RLIMIT_CORE): Operation not permitted" error
 RUN echo "Set disable_coredump false" >> /etc/sudo.conf
 
@@ -61,7 +63,7 @@ RUN yay -Scc
 
 ENV HOME=/home/devel
 
-WORKDIR /home/devel
+WORKDIR /workdir
 ONBUILD USER root
 ONBUILD WORKDIR /
 
@@ -129,9 +131,13 @@ RUN paccache -r -k0; \
 USER devel
 RUN yay -Scc
 
-WORKDIR /home/devel
+WORKDIR /workdir
 ONBUILD USER root
 ONBUILD WORKDIR /
 
 
 FROM ${DOCKER_TAG} as current
+USER devel
+WORKDIR /workdir
+ONBUILD USER root
+ONBUILD WORKDIR /
