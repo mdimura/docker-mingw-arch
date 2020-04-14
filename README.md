@@ -1,4 +1,4 @@
-docker-mingw-arch
+MinGW-arch
 =================
 mingw-based build environment based on arch-linux. The image provides easy and CI/CD friendly cross-compilation for windows target. mingw- versions of Qt5, cmake, Eigen3, boost are included. Dosens of [other libraries][1] are available from the package manager.
 
@@ -13,7 +13,7 @@ Usage
 ---------
 Start the docker container:
 ```bash
-sudo docker run -it burningdaylight/docker-mingw-arch /bin/bash
+sudo docker run -it burningdaylight/mingw-arch:qt /bin/bash
 ```
 Compile your application (QNapi is used as an example here):
 ```bash
