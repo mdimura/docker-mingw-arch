@@ -1,13 +1,14 @@
 MinGW-arch
 =================
-mingw-based build environment based on arch-linux. The image provides easy and CI/CD friendly cross-compilation for windows target. mingw- versions of Qt5, cmake, Eigen3, boost are included. Dosens of [other libraries][1] are available from the package manager.
+mingw-based build environment based on arch-linux. The image provides an easy to use cross-compilation for windows target. It is also CI-friendly. mingw- versions of Qt5, cmake, Eigen3, boost are included. Dosens of [other libraries][1] are available from the package manager.
 
 Table of Contents
 ----------------------
 
 1. [Usage](#Usage)
-2. [Dependencies](#Dependencies)
-3. [Supported tags](#Supported-tags)
+2. [Continuous Integration](#Continuous-Integration)
+3. [Dependencies](#Dependencies)
+4. [Supported tags](#Supported-tags)
 
 Usage
 ----------------------
@@ -30,6 +31,23 @@ To __deploy__ the program, you will need to copy the dlls from `/usr/{x86_64-w64
 
 That's it!
 
+Continuous Integration
+----------------------
+For Gitlab CI the config file could look something like this:
+```
+build-win64:
+  stage: compile
+  image: burningdaylight/mingw-arch:qt
+  script:
+    - mkdir -p ${CI_BUILD_NAME}
+    - cd ${CI_BUILD_NAME}; x86_64-w64-mingw32-qmake-qt5 ..; make
+  artifacts:
+    paths:
+      - "${CI_BUILD_NAME}/src/*/release/*.exe"
+      - "${CI_BUILD_NAME}/src/*/release/*.dll"
+```
+You can also check out the a full [.gitlab-ci.yml][4] file.
+
 Dependencies
 ----------------------
 If you need some other dependencies, you can install them from [AUR][1]. 
@@ -46,3 +64,4 @@ Supported tags
 [1]: https://aur.archlinux.org/packages/?O=0&SeB=nd&K=mingw-w64&outdated=&SB=v&SO=d&PP=250&do_Search=Go
 [2]: https://wiki.archlinux.org/index.php/creating_packages
 [3]: https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=mingw-w64-rapidjson
+[4]: https://github.com/Fluorescence-Tools/Olga/blob/master/.gitlab-ci.yml#L22
