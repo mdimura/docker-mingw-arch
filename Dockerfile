@@ -2,7 +2,7 @@
 # Based on ArchLinux image
 ARG DOCKER_TAG=qt
 
-FROM archlinux/base:latest as base
+FROM archlinux:base as base
 MAINTAINER Mykola Dimura <mykola.dimura@gmail.com>
 
 # Create devel user...
