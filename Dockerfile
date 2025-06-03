@@ -18,7 +18,7 @@ RUN pacman -Syyu --noconfirm --noprogressbar
 
 # Add packages to the base system
 RUN pacman -S --noconfirm --noprogressbar \
-        imagemagick make git binutils \
+        imagemagick make ninja git binutils \
         patch base-devel wget \
         pacman-contrib expac nano openssh
 
