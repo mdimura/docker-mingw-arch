@@ -1,6 +1,6 @@
 # MingW64 + Qt5 (optionally) for cross-compiling to Windows
 # Based on ArchLinux image
-ARG DOCKER_TAG=qt
+ARG DOCKER_TAG=qt5
 
 FROM archlinux:base AS base
 LABEL maintainer='Mykola Dimura <mykola.dimura@gmail.com>'
@@ -68,7 +68,7 @@ ONBUILD USER root
 ONBUILD WORKDIR /
 
 
-FROM base AS qt
+FROM base AS qt5
 
 USER root
 # Install Qt5 and some other MingW packages (from ownstuff)
