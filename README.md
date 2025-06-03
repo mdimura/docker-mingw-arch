@@ -14,7 +14,7 @@ Usage
 ----------------------
 Start the docker container:
 ```bash
-sudo docker run -it burningdaylight/mingw-arch:qt /bin/bash
+sudo docker run -it ghcr.io/mdimura/docker-mingw-arch:qt5 /bin/bash
 ```
 Compile your application (QNapi is used as an example here):
 ```bash
@@ -37,7 +37,7 @@ For Gitlab CI the config file could look something like this:
 ```
 build-win64:
   stage: compile
-  image: burningdaylight/mingw-arch:qt
+  image: ghcr.io/mdimura/docker-mingw-arch:qt5
   script:
     - mkdir -p ${CI_BUILD_NAME}
     - cd ${CI_BUILD_NAME}; x86_64-w64-mingw32-qmake-qt5 ..; make
@@ -46,7 +46,6 @@ build-win64:
       - "${CI_BUILD_NAME}/src/*/release/*.exe"
       - "${CI_BUILD_NAME}/src/*/release/*.dll"
 ```
-You can also check out the a full [.gitlab-ci.yml][4] file.
 
 Dependencies
 ----------------------
@@ -64,4 +63,3 @@ Supported tags
 [1]: https://aur.archlinux.org/packages/?O=0&SeB=nd&K=mingw-w64&outdated=&SB=v&SO=d&PP=250&do_Search=Go
 [2]: https://wiki.archlinux.org/index.php/creating_packages
 [3]: https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=mingw-w64-rapidjson
-[4]: https://github.com/Fluorescence-Tools/Olga/blob/master/.gitlab-ci.yml#L22

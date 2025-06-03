@@ -1,0 +1,17 @@
+name: docker image CI for ghcr
+
+on: [push]
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: build and push the image
+        run: |
+              docker login --username mdimura --password ${{ secrets.GHCR_TKN }} ghcr.io
+              for tag in base qt5; do
+                docker build . --build-arg DOCKER_TAG=${tag} --tag ghcr.io/mdimura/docker-mingw-arch:${tag}
+                docker push ghcr.io/mdimura/docker-mingw-arch:${tag}
+              done
+              docker tag ghcr.io/mdimura/docker-mingw-arch:qt5 ghcr.io/mdimura/docker-mingw-arch:latest
+              docker push ghcr.io/mdimura/docker-mingw-arch:latest

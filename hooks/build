@@ -1,8 +1,0 @@
-#!/bin/bash
-
-docker build --build-arg DOCKER_TAG=$DOCKER_TAG -f "$DOCKERFILE_PATH"  -t $IMAGE_NAME .
-
-if [ "$DOCKER_TAG" == "qt" ]; then
-   docker tag $IMAGE_NAME ${DOCKER_REPO}:latest
-   docker push ${DOCKER_REPO}:latest
-fi
