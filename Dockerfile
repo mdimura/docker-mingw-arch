@@ -2,8 +2,8 @@
 # Based on ArchLinux image
 ARG DOCKER_TAG=qt
 
-FROM archlinux:base as base
-MAINTAINER Mykola Dimura <mykola.dimura@gmail.com>
+FROM archlinux:base AS base
+LABEL maintainer='Mykola Dimura <mykola.dimura@gmail.com>'
 
 # Create devel user...
 RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
@@ -68,7 +68,7 @@ ONBUILD USER root
 ONBUILD WORKDIR /
 
 
-FROM base as qt
+FROM base AS qt
 
 USER root
 # Install Qt5 and some other MingW packages (from ownstuff)
@@ -136,7 +136,7 @@ ONBUILD USER root
 ONBUILD WORKDIR /
 
 
-FROM ${DOCKER_TAG} as current
+FROM ${DOCKER_TAG} AS current
 USER devel
 WORKDIR /workdir
 ONBUILD USER root
