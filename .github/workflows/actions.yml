@@ -3,7 +3,7 @@ name: docker image CI for ghcr
 on: [push]
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ env.REGISTRY }}/${{ github.repository }}
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
