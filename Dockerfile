@@ -4,6 +4,7 @@ ARG DOCKER_TAG=qt5
 
 FROM archlinux:base AS base
 LABEL maintainer='Mykola Dimura <mykola.dimura@gmail.com>'
+LABEL org.opencontainers.image.source https://github.com/mdimura/docker-mingw-arch
 
 # Create devel user...
 RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
