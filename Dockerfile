@@ -1,10 +1,10 @@
+ARG DOCKER_TAG=qt5 #default tag.
+
+FROM archlinux:base AS base
 LABEL org.opencontainers.image.authors='Mykola Dimura <mykola.dimura@gmail.com>'
 LABEL org.opencontainers.image.source=https://github.com/mdimura/docker-mingw-arch
 LABEL org.opencontainers.image.description="Mingw-based build environment based on arch-linux. Easy cross-compilation for windows target."
 LABEL org.opencontainers.image.licenses=MIT
-
-ARG DOCKER_TAG=qt5 #default tag.
-FROM archlinux:base AS base
 
 # Create devel user...
 RUN useradd -m -d /home/devel -u 1000 -U -G users,tty -s /bin/bash devel
