@@ -1,17 +1,22 @@
 name: docker image CI for ghcr
 
 on: [push]
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: build and push the image
         run: |
-              docker login --username mdimura --password ${{ secrets.GITHUB_TOKEN }} ghcr.io
+              docker login --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} ${{ env.REGISTRY }}
               for tag in base qt5; do
-                docker build . --build-arg DOCKER_TAG=${tag} --tag ghcr.io/mdimura/docker-mingw-arch:${tag}
-                docker push ghcr.io/mdimura/docker-mingw-arch:${tag}
+                docker build . --build-arg DOCKER_TAG=${tag} --tag ${{ env.IMAGE_NAME }}:${tag}
+                docker push ${{ env.IMAGE_NAME }}:${tag}
               done
-              docker tag ghcr.io/mdimura/docker-mingw-arch:qt5 ghcr.io/mdimura/docker-mingw-arch:latest
-              docker push ghcr.io/mdimura/docker-mingw-arch:latest
+              docker tag ${{ env.IMAGE_NAME }}:qt5 ${{ env.IMAGE_NAME }}:latest
+              docker push ${{ env.IMAGE_NAME }}:latest
